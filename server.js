@@ -16,7 +16,7 @@ app.use(cookieParser());
 
 // CORS - CRUCIAL for cookies
 app.use(cors({
-    origin: ['http://localhost:3000','https://auth-frontend-steel.vercel.app/dashboard/api/auth'],  // Frontend URL
+    origin: ['http://localhost:3000','https://auth-frontend-steel.vercel.app'],  // Frontend URL
     credentials: true, 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
                 // Allow cookies
