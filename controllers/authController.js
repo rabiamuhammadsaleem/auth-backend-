@@ -1,184 +1,550 @@
+// // const User = require('../models/User');
+// // const jwt = require('jsonwebtoken');
+
+// // console.log('🔵 [CONTROLLER] Auth controller loaded');
+
+// // // Generate JWT Token
+// // const generateToken = (userId) => {
+// //     console.log(`🔑 [TOKEN] Generating token for user: ${userId}`);
+// //     return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+// //         expiresIn: '7d'
+// //     });
+// // };
+
+// // // @desc    Register user
+// // // @route   POST /api/auth/signup
+// // // @access  Public
+// // const signup = async (req, res) => {
+// //     console.log('📝 [SIGNUP] Signup request received');
+// //     console.log('📦 [SIGNUP] Request body:', req.body);
+    
+// //     try {
+// //         const { name, email, password } = req.body;
+        
+// //         // Validation
+// //         if (!name || !email || !password) {
+// //             console.log('❌ [SIGNUP] Missing fields');
+// //             return res.status(400).json({ 
+// //                 success: false, 
+// //                 message: 'Please provide name, email and password' 
+// //             });
+// //         }
+        
+// //         if (password.length < 6) {
+// //             console.log('❌ [SIGNUP] Password too short');
+// //             return res.status(400).json({ 
+// //                 success: false, 
+// //                 message: 'Password must be at least 6 characters' 
+// //             });
+// //         }
+        
+// //         // Check if user already exists
+// //         console.log(`🔍 [SIGNUP] Checking if email exists: ${email}`);
+// //         const existingUser = await User.findOne({ email });
+        
+// //         if (existingUser) {
+// //             console.log('❌ [SIGNUP] User already exists');
+// //             return res.status(400).json({ 
+// //                 success: false, 
+// //                 message: 'User already exists with this email' 
+// //             });
+// //         }
+        
+// //         // Create user
+// //         console.log('👤 [SIGNUP] Creating new user...');
+// //         const user = await User.create({
+// //             name,
+// //             email,
+// //             password
+// //         });
+        
+// //         console.log('✅ [SIGNUP] User created successfully:', user._id);
+        
+// //         // Generate token
+// //         const token = generateToken(user._id);
+        
+// //         // Set cookie
+// //         res.cookie('token', token, {
+// //             httpOnly: true,
+// //             secure: process.env.NODE_ENV === 'production',
+// //             sameSite: 'lax',
+// //             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+// //         });
+        
+// //         console.log('🍪 [SIGNUP] Cookie set with token');
+        
+// //         // Send response
+// //         res.status(201).json({
+// //             success: true,
+// //             message: 'User registered successfully',
+// //             user: {
+// //                 id: user._id,
+// //                 name: user.name,
+// //                 email: user.email
+// //             }
+// //         });
+        
+// //     } catch (error) {
+// //         console.log('🔥 [SIGNUP] Error:', error.message);
+// //         res.status(500).json({ 
+// //             success: false, 
+// //             message: 'Server error', 
+// //             error: error.message 
+// //         });
+// //     }
+// // };
+
+// // // @desc    Login user
+// // // @route   POST /api/auth/login
+// // // @access  Public
+// // const login = async (req, res) => {
+// //     console.log('🔐 [LOGIN] Login request received');
+// //     console.log('📦 [LOGIN] Request body:', req.body);
+    
+// //     try {
+// //         const { email, password } = req.body;
+        
+// //         // Validation
+// //         if (!email || !password) {
+// //             console.log('❌ [LOGIN] Missing email or password');
+// //             return res.status(400).json({ 
+// //                 success: false, 
+// //                 message: 'Please provide email and password' 
+// //             });
+// //         }
+        
+// //         // Check if user exists
+// //         console.log(`🔍 [LOGIN] Finding user: ${email}`);
+// //         const user = await User.findOne({ email });
+        
+// //         if (!user) {
+// //             console.log('❌ [LOGIN] User not found');
+// //             return res.status(401).json({ 
+// //                 success: false, 
+// //                 message: 'Invalid credentials' 
+// //             });
+// //         }
+        
+// //         // Check password
+// //         console.log(`🔐 [LOGIN] Verifying password for: ${email}`);
+// //         const isPasswordMatch = await user.comparePassword(password);
+        
+// //         if (!isPasswordMatch) {
+// //             console.log('❌ [LOGIN] Password mismatch');
+// //             return res.status(401).json({ 
+// //                 success: false, 
+// //                 message: 'Invalid credentials' 
+// //             });
+// //         }
+        
+// //         console.log('✅ [LOGIN] Password verified successfully');
+        
+// //         // Generate token
+// //         const token = generateToken(user._id);
+        
+// //         // Set cookie
+// //         res.cookie('token', token, {
+// //             httpOnly: true,
+// //             secure: process.env.NODE_ENV === 'production',
+// //             sameSite: 'lax',
+// //             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+// //         });
+        
+// //         console.log('🍪 [LOGIN] Cookie set with token');
+        
+// //         // Send response
+// //         res.status(200).json({
+// //             success: true,
+// //             message: 'Login successful',
+// //             user: {
+// //                 id: user._id,
+// //                 name: user.name,
+// //                 email: user.email
+// //             }
+// //         });
+        
+// //     } catch (error) {
+// //         console.log('🔥 [LOGIN] Error:', error.message);
+// //         res.status(500).json({ 
+// //             success: false, 
+// //             message: 'Server error', 
+// //             error: error.message 
+// //         });
+// //     }
+// // };
+
+// // module.exports = { signup, login };
+
+
 // const User = require('../models/User');
 // const jwt = require('jsonwebtoken');
+// const bcrypt = require('bcryptjs');
 
-// console.log('🔵 [CONTROLLER] Auth controller loaded');
-
-// // Generate JWT Token
-// const generateToken = (userId) => {
-//     console.log(`🔑 [TOKEN] Generating token for user: ${userId}`);
-//     return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+// const generateToken = (id) => {
+//     return jwt.sign({ id }, process.env.JWT_SECRET, {
 //         expiresIn: '7d'
 //     });
 // };
 
-// // @desc    Register user
-// // @route   POST /api/auth/signup
-// // @access  Public
+// // SIGNUP
 // const signup = async (req, res) => {
-//     console.log('📝 [SIGNUP] Signup request received');
-//     console.log('📦 [SIGNUP] Request body:', req.body);
+//     console.log('📝 Signup:', req.body);
     
 //     try {
 //         const { name, email, password } = req.body;
         
-//         // Validation
-//         if (!name || !email || !password) {
-//             console.log('❌ [SIGNUP] Missing fields');
-//             return res.status(400).json({ 
-//                 success: false, 
-//                 message: 'Please provide name, email and password' 
-//             });
+//         const userExists = await User.findOne({ email });
+//         if (userExists) {
+//             return res.status(400).json({ success: false, message: 'User already exists' });
 //         }
         
-//         if (password.length < 6) {
-//             console.log('❌ [SIGNUP] Password too short');
-//             return res.status(400).json({ 
-//                 success: false, 
-//                 message: 'Password must be at least 6 characters' 
-//             });
-//         }
+//         const salt = await bcrypt.genSalt(10);
+//         const hashedPassword = await bcrypt.hash(password, salt);
         
-//         // Check if user already exists
-//         console.log(`🔍 [SIGNUP] Checking if email exists: ${email}`);
-//         const existingUser = await User.findOne({ email });
+//         const user = await User.create({ name, email, password: hashedPassword });
         
-//         if (existingUser) {
-//             console.log('❌ [SIGNUP] User already exists');
-//             return res.status(400).json({ 
-//                 success: false, 
-//                 message: 'User already exists with this email' 
-//             });
-//         }
-        
-//         // Create user
-//         console.log('👤 [SIGNUP] Creating new user...');
-//         const user = await User.create({
-//             name,
-//             email,
-//             password
-//         });
-        
-//         console.log('✅ [SIGNUP] User created successfully:', user._id);
-        
-//         // Generate token
 //         const token = generateToken(user._id);
         
-//         // Set cookie
+//         // COOKIE SETTING - IMPORTANT
 //         res.cookie('token', token, {
 //             httpOnly: true,
-//             secure: process.env.NODE_ENV === 'production',
-//             sameSite: 'lax',
-//             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+//             secure: false,           // false for localhost (http)
+//             sameSite: 'lax',         // Allow cross-site
+//             maxAge: 7 * 24 * 60 * 60 * 1000,
+//             path: '/'                // Cookie available on all routes
 //         });
         
-//         console.log('🍪 [SIGNUP] Cookie set with token');
+//         console.log('🍪 Cookie set with flags: httpOnly=true, secure=false, sameSite=lax');
         
-//         // Send response
 //         res.status(201).json({
 //             success: true,
-//             message: 'User registered successfully',
-//             user: {
-//                 id: user._id,
-//                 name: user.name,
-//                 email: user.email
-//             }
+//             user: { id: user._id, name: user.name, email: user.email }
 //         });
         
 //     } catch (error) {
-//         console.log('🔥 [SIGNUP] Error:', error.message);
-//         res.status(500).json({ 
-//             success: false, 
-//             message: 'Server error', 
-//             error: error.message 
-//         });
+//         console.error('Signup Error:', error);
+//         res.status(500).json({ success: false, message: 'Server error' });
 //     }
 // };
 
-// // @desc    Login user
-// // @route   POST /api/auth/login
-// // @access  Public
+// // LOGIN
 // const login = async (req, res) => {
-//     console.log('🔐 [LOGIN] Login request received');
-//     console.log('📦 [LOGIN] Request body:', req.body);
+//     console.log('🔐 Login:', req.body.email);
     
 //     try {
 //         const { email, password } = req.body;
         
-//         // Validation
-//         if (!email || !password) {
-//             console.log('❌ [LOGIN] Missing email or password');
-//             return res.status(400).json({ 
-//                 success: false, 
-//                 message: 'Please provide email and password' 
-//             });
-//         }
-        
-//         // Check if user exists
-//         console.log(`🔍 [LOGIN] Finding user: ${email}`);
 //         const user = await User.findOne({ email });
-        
 //         if (!user) {
-//             console.log('❌ [LOGIN] User not found');
-//             return res.status(401).json({ 
-//                 success: false, 
-//                 message: 'Invalid credentials' 
-//             });
+//             return res.status(401).json({ success: false, message: 'Invalid credentials' });
 //         }
         
-//         // Check password
-//         console.log(`🔐 [LOGIN] Verifying password for: ${email}`);
-//         const isPasswordMatch = await user.comparePassword(password);
-        
-//         if (!isPasswordMatch) {
-//             console.log('❌ [LOGIN] Password mismatch');
-//             return res.status(401).json({ 
-//                 success: false, 
-//                 message: 'Invalid credentials' 
-//             });
+//         const isMatch = await bcrypt.compare(password, user.password);
+//         if (!isMatch) {
+//             return res.status(401).json({ success: false, message: 'Invalid credentials' });
 //         }
         
-//         console.log('✅ [LOGIN] Password verified successfully');
-        
-//         // Generate token
 //         const token = generateToken(user._id);
         
-//         // Set cookie
+//         // COOKIE SETTING - SAME AS SIGNUP
 //         res.cookie('token', token, {
 //             httpOnly: true,
-//             secure: process.env.NODE_ENV === 'production',
+//             secure: false,           // false for localhost
 //             sameSite: 'lax',
-//             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+//             maxAge: 7 * 24 * 60 * 60 * 1000,
+//             path: '/'
 //         });
         
-//         console.log('🍪 [LOGIN] Cookie set with token');
+//         console.log('🍪 Login cookie set');
         
-//         // Send response
-//         res.status(200).json({
+//         res.json({
 //             success: true,
-//             message: 'Login successful',
-//             user: {
-//                 id: user._id,
-//                 name: user.name,
-//                 email: user.email
-//             }
+//             user: { id: user._id, name: user.name, email: user.email }
 //         });
         
 //     } catch (error) {
-//         console.log('🔥 [LOGIN] Error:', error.message);
-//         res.status(500).json({ 
-//             success: false, 
-//             message: 'Server error', 
-//             error: error.message 
-//         });
+//         console.error('Login Error:', error);
+//         res.status(500).json({ success: false, message: 'Server error' });
 //     }
 // };
 
-// module.exports = { signup, login };
+// // GET ME - Protected
+// const getMe = async (req, res) => {
+//     console.log('👤 GetMe called, user:', req.user?.email);
+    
+//     try {
+//         res.json({
+//             success: true,
+//             user: {
+//                 id: req.user._id,
+//                 name: req.user.name,
+//                 email: req.user.email,
+//                 createdAt: req.user.createdAt
+//             }
+//         });
+//     } catch (error) {
+//         res.status(500).json({ success: false, message: 'Server error' });
+//     }
+// };
+
+// // LOGOUT
+// const logout = async (req, res) => {
+//     console.log('🚪 Logout');
+    
+//     // Clear cookie
+//     res.cookie('token', '', {
+//         httpOnly: true,
+//         expires: new Date(0),
+//         path: '/'
+//     });
+    
+//     res.json({ success: true, message: 'Logged out' });
+// };
+
+// module.exports = { signup, login, getMe, logout };
+
+
+
+// // const User = require('../models/User');
+// // const jwt = require('jsonwebtoken');
+// // const bcrypt = require('bcryptjs');
+
+// // console.log('🔵 [CONTROLLER] Auth controller loaded');
+
+// // // Generate JWT Token
+// // const generateToken = (userId) => {
+// //     console.log(`🔑 [TOKEN] Generating token for user: ${userId}`);
+// //     return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+// //         expiresIn: '7d'
+// //     });
+// // };
+
+// // // @desc    Register user
+// // // @route   POST /api/auth/signup
+// // // @access  Public
+// // const signup = async (req, res) => {
+// //     console.log('📝 [SIGNUP] Signup request received');
+// //     console.log('📦 [SIGNUP] Request body:', req.body);
+    
+// //     try {
+// //         const { name, email, password } = req.body;
+        
+// //         // Validation
+// //         if (!name || !email || !password) {
+// //             console.log('❌ [SIGNUP] Missing fields');
+// //             return res.status(400).json({ 
+// //                 success: false, 
+// //                 message: 'Please provide name, email and password' 
+// //             });
+// //         }
+        
+// //         if (password.length < 6) {
+// //             console.log('❌ [SIGNUP] Password too short');
+// //             return res.status(400).json({ 
+// //                 success: false, 
+// //                 message: 'Password must be at least 6 characters' 
+// //             });
+// //         }
+        
+// //         // Check if user already exists
+// //         console.log(`🔍 [SIGNUP] Checking if email exists: ${email}`);
+// //         const existingUser = await User.findOne({ email });
+        
+// //         if (existingUser) {
+// //             console.log('❌ [SIGNUP] User already exists');
+// //             return res.status(400).json({ 
+// //                 success: false, 
+// //                 message: 'User already exists with this email' 
+// //             });
+// //         }
+        
+// //         // Hash password manually
+// //         console.log('🔐 [SIGNUP] Hashing password...');
+// //         const salt = await bcrypt.genSalt(10);
+// //         const hashedPassword = await bcrypt.hash(password, salt);
+// //         console.log('✅ [SIGNUP] Password hashed successfully');
+        
+// //         // Create user
+// //         console.log('👤 [SIGNUP] Creating new user...');
+// //         const user = await User.create({
+// //             name,
+// //             email,
+// //             password: hashedPassword
+// //         });
+        
+// //         console.log('✅ [SIGNUP] User created successfully:', user._id);
+        
+// //         // Generate token
+// //         const token = generateToken(user._id);
+        
+// //         // Set cookie
+// //         res.cookie('token', token, {
+// //             httpOnly: true,
+// //             secure: process.env.NODE_ENV === 'production',
+// //             sameSite: 'lax',
+// //             maxAge: 7 * 24 * 60 * 60 * 1000
+// //         });
+        
+// //         console.log('🍪 [SIGNUP] Cookie set with token');
+        
+// //         // Send response
+// //         res.status(201).json({
+// //             success: true,
+// //             message: 'User registered successfully',
+// //             user: {
+// //                 id: user._id,
+// //                 name: user.name,
+// //                 email: user.email
+// //             }
+// //         });
+        
+// //     } catch (error) {
+// //         console.log('🔥 [SIGNUP] Error:', error.message);
+// //         res.status(500).json({ 
+// //             success: false, 
+// //             message: 'Server error', 
+// //             error: error.message 
+// //         });
+// //     }
+// // };
+
+// // // @desc    Login user
+// // // @route   POST /api/auth/login
+// // // @access  Public
+// // const login = async (req, res) => {
+// //     console.log('🔐 [LOGIN] Login request received');
+// //     console.log('📦 [LOGIN] Request body:', req.body);
+    
+// //     try {
+// //         const { email, password } = req.body;
+        
+// //         if (!email || !password) {
+// //             console.log('❌ [LOGIN] Missing email or password');
+// //             return res.status(400).json({ 
+// //                 success: false, 
+// //                 message: 'Please provide email and password' 
+// //             });
+// //         }
+        
+// //         console.log(`🔍 [LOGIN] Finding user: ${email}`);
+// //         const user = await User.findOne({ email });
+        
+// //         if (!user) {
+// //             console.log('❌ [LOGIN] User not found');
+// //             return res.status(401).json({ 
+// //                 success: false, 
+// //                 message: 'Invalid credentials' 
+// //             });
+// //         }
+        
+// //         console.log(`🔐 [LOGIN] Verifying password for: ${email}`);
+// //         const isPasswordMatch = await bcrypt.compare(password, user.password);
+        
+// //         if (!isPasswordMatch) {
+// //             console.log('❌ [LOGIN] Password mismatch');
+// //             return res.status(401).json({ 
+// //                 success: false, 
+// //                 message: 'Invalid credentials' 
+// //             });
+// //         }
+        
+// //         console.log('✅ [LOGIN] Password verified successfully');
+        
+// //         const token = generateToken(user._id);
+        
+// //         res.cookie('token', token, {
+// //             httpOnly: true,
+// //             secure: process.env.NODE_ENV === 'production',
+// //             sameSite: 'lax',
+// //             maxAge: 7 * 24 * 60 * 60 * 1000
+// //         });
+        
+// //         console.log('🍪 [LOGIN] Cookie set with token');
+        
+// //         res.status(200).json({
+// //             success: true,
+// //             message: 'Login successful',
+// //             user: {
+// //                 id: user._id,
+// //                 name: user.name,
+// //                 email: user.email
+// //             }
+// //         });
+        
+// //     } catch (error) {
+// //         console.log('🔥 [LOGIN] Error:', error.message);
+// //         res.status(500).json({ 
+// //             success: false, 
+// //             message: 'Server error', 
+// //             error: error.message 
+// //         });
+// //     }
+// // };
+
+// // // @desc    Get current logged in user
+// // // @route   GET /api/auth/me
+// // // @access  Private
+// // const getMe = async (req, res) => {
+// //     console.log('👤 [GET-ME] Getting current user');
+// //     console.log(`📧 [GET-ME] User email: ${req.user.email}`);
+    
+// //     try {
+// //         res.status(200).json({
+// //             success: true,
+// //             user: {
+// //                 id: req.user._id,
+// //                 name: req.user.name,
+// //                 email: req.user.email,
+// //                 createdAt: req.user.createdAt
+// //             }
+// //         });
+// //     } catch (error) {
+// //         console.log('❌ [GET-ME] Error:', error.message);
+// //         res.status(500).json({
+// //             success: false,
+// //             message: 'Server error'
+// //         });
+// //     }
+// // };
+
+// // // @desc    Logout user / Clear cookie
+// // // @route   POST /api/auth/logout
+// // // @access  Public
+// // const logout = async (req, res) => {
+// //     console.log('🚪 [LOGOUT] Logging out user');
+    
+// //     try {
+// //         // Clear the cookie
+// //         res.cookie('token', '', {
+// //             httpOnly: true,
+// //             expires: new Date(0),
+// //             secure: process.env.NODE_ENV === 'production',
+// //             sameSite: 'lax'
+// //         });
+        
+// //         console.log('✅ [LOGOUT] Cookie cleared successfully');
+        
+// //         res.status(200).json({
+// //             success: true,
+// //             message: 'Logged out successfully'
+// //         });
+// //     } catch (error) {
+// //         console.log('❌ [LOGOUT] Error:', error.message);
+// //         res.status(500).json({
+// //             success: false,
+// //             message: 'Server error'
+// //         });
+// //     }
+// // };
+
+// // module.exports = { signup, login, getMe, logout };
 
 
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+
+console.log('🔵 [CONTROLLER] Auth controller loaded');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -188,89 +554,155 @@ const generateToken = (id) => {
 
 // SIGNUP
 const signup = async (req, res) => {
-    console.log('📝 Signup:', req.body);
+    console.log('📝 Signup request received');
+    console.log('📦 Body:', req.body);
     
     try {
         const { name, email, password } = req.body;
         
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ success: false, message: 'User already exists' });
+        // Validation
+        if (!name || !email || !password) {
+            console.log('❌ Missing fields');
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Please provide all fields' 
+            });
         }
         
+        if (password.length < 6) {
+            console.log('❌ Password too short');
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Password must be at least 6 characters' 
+            });
+        }
+        
+        // Check if user exists
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            console.log('❌ User already exists');
+            return res.status(400).json({ 
+                success: false, 
+                message: 'User already exists' 
+            });
+        }
+        
+        // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         
-        const user = await User.create({ name, email, password: hashedPassword });
-        
-        const token = generateToken(user._id);
-        
-        // COOKIE SETTING - IMPORTANT
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: false,           // false for localhost (http)
-            sameSite: 'lax',         // Allow cross-site
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            path: '/'                // Cookie available on all routes
+        // Create user
+        const user = await User.create({
+            name,
+            email,
+            password: hashedPassword
         });
         
-        console.log('🍪 Cookie set with flags: httpOnly=true, secure=false, sameSite=lax');
+        console.log('✅ User created:', user._id);
         
-        res.status(201).json({
-            success: true,
-            user: { id: user._id, name: user.name, email: user.email }
-        });
-        
-    } catch (error) {
-        console.error('Signup Error:', error);
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-};
-
-// LOGIN
-const login = async (req, res) => {
-    console.log('🔐 Login:', req.body.email);
-    
-    try {
-        const { email, password } = req.body;
-        
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'Invalid credentials' });
-        }
-        
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Invalid credentials' });
-        }
-        
+        // Generate token
         const token = generateToken(user._id);
         
-        // COOKIE SETTING - SAME AS SIGNUP
+        // Set cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: false,           // false for localhost
+            secure: false,
             sameSite: 'lax',
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/'
         });
         
-        console.log('🍪 Login cookie set');
+        console.log('🍪 Cookie set');
         
-        res.json({
+        res.status(201).json({
             success: true,
-            user: { id: user._id, name: user.name, email: user.email }
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                createdAt: user.createdAt
+            }
         });
         
     } catch (error) {
-        console.error('Login Error:', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error('🔥 Signup Error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error',
+            error: error.message 
+        });
     }
 };
 
-// GET ME - Protected
+// LOGIN
+const login = async (req, res) => {
+    console.log('🔐 Login request received');
+    console.log('📦 Body:', req.body);
+    
+    try {
+        const { email, password } = req.body;
+        
+        if (!email || !password) {
+            console.log('❌ Missing email or password');
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Please provide email and password' 
+            });
+        }
+        
+        const user = await User.findOne({ email });
+        if (!user) {
+            console.log('❌ User not found');
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Invalid credentials' 
+            });
+        }
+        
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            console.log('❌ Password mismatch');
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Invalid credentials' 
+            });
+        }
+        
+        const token = generateToken(user._id);
+        
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/'
+        });
+        
+        console.log('✅ Login successful:', email);
+        console.log('🍪 Cookie set');
+        
+        res.json({
+            success: true,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                createdAt: user.createdAt
+            }
+        });
+        
+    } catch (error) {
+        console.error('🔥 Login Error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+};
+
+// GET ME (Protected)
 const getMe = async (req, res) => {
-    console.log('👤 GetMe called, user:', req.user?.email);
+    console.log('👤 GetMe called');
     
     try {
         res.json({
@@ -283,258 +715,28 @@ const getMe = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error('🔥 GetMe Error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
     }
 };
 
 // LOGOUT
 const logout = async (req, res) => {
-    console.log('🚪 Logout');
+    console.log('🚪 Logout called');
     
-    // Clear cookie
     res.cookie('token', '', {
         httpOnly: true,
         expires: new Date(0),
         path: '/'
     });
     
-    res.json({ success: true, message: 'Logged out' });
+    res.json({ 
+        success: true, 
+        message: 'Logged out successfully' 
+    });
 };
 
 module.exports = { signup, login, getMe, logout };
-
-
-
-// const User = require('../models/User');
-// const jwt = require('jsonwebtoken');
-// const bcrypt = require('bcryptjs');
-
-// console.log('🔵 [CONTROLLER] Auth controller loaded');
-
-// // Generate JWT Token
-// const generateToken = (userId) => {
-//     console.log(`🔑 [TOKEN] Generating token for user: ${userId}`);
-//     return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-//         expiresIn: '7d'
-//     });
-// };
-
-// // @desc    Register user
-// // @route   POST /api/auth/signup
-// // @access  Public
-// const signup = async (req, res) => {
-//     console.log('📝 [SIGNUP] Signup request received');
-//     console.log('📦 [SIGNUP] Request body:', req.body);
-    
-//     try {
-//         const { name, email, password } = req.body;
-        
-//         // Validation
-//         if (!name || !email || !password) {
-//             console.log('❌ [SIGNUP] Missing fields');
-//             return res.status(400).json({ 
-//                 success: false, 
-//                 message: 'Please provide name, email and password' 
-//             });
-//         }
-        
-//         if (password.length < 6) {
-//             console.log('❌ [SIGNUP] Password too short');
-//             return res.status(400).json({ 
-//                 success: false, 
-//                 message: 'Password must be at least 6 characters' 
-//             });
-//         }
-        
-//         // Check if user already exists
-//         console.log(`🔍 [SIGNUP] Checking if email exists: ${email}`);
-//         const existingUser = await User.findOne({ email });
-        
-//         if (existingUser) {
-//             console.log('❌ [SIGNUP] User already exists');
-//             return res.status(400).json({ 
-//                 success: false, 
-//                 message: 'User already exists with this email' 
-//             });
-//         }
-        
-//         // Hash password manually
-//         console.log('🔐 [SIGNUP] Hashing password...');
-//         const salt = await bcrypt.genSalt(10);
-//         const hashedPassword = await bcrypt.hash(password, salt);
-//         console.log('✅ [SIGNUP] Password hashed successfully');
-        
-//         // Create user
-//         console.log('👤 [SIGNUP] Creating new user...');
-//         const user = await User.create({
-//             name,
-//             email,
-//             password: hashedPassword
-//         });
-        
-//         console.log('✅ [SIGNUP] User created successfully:', user._id);
-        
-//         // Generate token
-//         const token = generateToken(user._id);
-        
-//         // Set cookie
-//         res.cookie('token', token, {
-//             httpOnly: true,
-//             secure: process.env.NODE_ENV === 'production',
-//             sameSite: 'lax',
-//             maxAge: 7 * 24 * 60 * 60 * 1000
-//         });
-        
-//         console.log('🍪 [SIGNUP] Cookie set with token');
-        
-//         // Send response
-//         res.status(201).json({
-//             success: true,
-//             message: 'User registered successfully',
-//             user: {
-//                 id: user._id,
-//                 name: user.name,
-//                 email: user.email
-//             }
-//         });
-        
-//     } catch (error) {
-//         console.log('🔥 [SIGNUP] Error:', error.message);
-//         res.status(500).json({ 
-//             success: false, 
-//             message: 'Server error', 
-//             error: error.message 
-//         });
-//     }
-// };
-
-// // @desc    Login user
-// // @route   POST /api/auth/login
-// // @access  Public
-// const login = async (req, res) => {
-//     console.log('🔐 [LOGIN] Login request received');
-//     console.log('📦 [LOGIN] Request body:', req.body);
-    
-//     try {
-//         const { email, password } = req.body;
-        
-//         if (!email || !password) {
-//             console.log('❌ [LOGIN] Missing email or password');
-//             return res.status(400).json({ 
-//                 success: false, 
-//                 message: 'Please provide email and password' 
-//             });
-//         }
-        
-//         console.log(`🔍 [LOGIN] Finding user: ${email}`);
-//         const user = await User.findOne({ email });
-        
-//         if (!user) {
-//             console.log('❌ [LOGIN] User not found');
-//             return res.status(401).json({ 
-//                 success: false, 
-//                 message: 'Invalid credentials' 
-//             });
-//         }
-        
-//         console.log(`🔐 [LOGIN] Verifying password for: ${email}`);
-//         const isPasswordMatch = await bcrypt.compare(password, user.password);
-        
-//         if (!isPasswordMatch) {
-//             console.log('❌ [LOGIN] Password mismatch');
-//             return res.status(401).json({ 
-//                 success: false, 
-//                 message: 'Invalid credentials' 
-//             });
-//         }
-        
-//         console.log('✅ [LOGIN] Password verified successfully');
-        
-//         const token = generateToken(user._id);
-        
-//         res.cookie('token', token, {
-//             httpOnly: true,
-//             secure: process.env.NODE_ENV === 'production',
-//             sameSite: 'lax',
-//             maxAge: 7 * 24 * 60 * 60 * 1000
-//         });
-        
-//         console.log('🍪 [LOGIN] Cookie set with token');
-        
-//         res.status(200).json({
-//             success: true,
-//             message: 'Login successful',
-//             user: {
-//                 id: user._id,
-//                 name: user.name,
-//                 email: user.email
-//             }
-//         });
-        
-//     } catch (error) {
-//         console.log('🔥 [LOGIN] Error:', error.message);
-//         res.status(500).json({ 
-//             success: false, 
-//             message: 'Server error', 
-//             error: error.message 
-//         });
-//     }
-// };
-
-// // @desc    Get current logged in user
-// // @route   GET /api/auth/me
-// // @access  Private
-// const getMe = async (req, res) => {
-//     console.log('👤 [GET-ME] Getting current user');
-//     console.log(`📧 [GET-ME] User email: ${req.user.email}`);
-    
-//     try {
-//         res.status(200).json({
-//             success: true,
-//             user: {
-//                 id: req.user._id,
-//                 name: req.user.name,
-//                 email: req.user.email,
-//                 createdAt: req.user.createdAt
-//             }
-//         });
-//     } catch (error) {
-//         console.log('❌ [GET-ME] Error:', error.message);
-//         res.status(500).json({
-//             success: false,
-//             message: 'Server error'
-//         });
-//     }
-// };
-
-// // @desc    Logout user / Clear cookie
-// // @route   POST /api/auth/logout
-// // @access  Public
-// const logout = async (req, res) => {
-//     console.log('🚪 [LOGOUT] Logging out user');
-    
-//     try {
-//         // Clear the cookie
-//         res.cookie('token', '', {
-//             httpOnly: true,
-//             expires: new Date(0),
-//             secure: process.env.NODE_ENV === 'production',
-//             sameSite: 'lax'
-//         });
-        
-//         console.log('✅ [LOGOUT] Cookie cleared successfully');
-        
-//         res.status(200).json({
-//             success: true,
-//             message: 'Logged out successfully'
-//         });
-//     } catch (error) {
-//         console.log('❌ [LOGOUT] Error:', error.message);
-//         res.status(500).json({
-//             success: false,
-//             message: 'Server error'
-//         });
-//     }
-// };
-
-// module.exports = { signup, login, getMe, logout };
