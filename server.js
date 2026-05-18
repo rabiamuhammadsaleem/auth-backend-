@@ -29,11 +29,25 @@ console.log('✅ Middleware configured with CORS credentials: true');
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
-// Test route
-app.get('/api/test', (req, res) => {
-    console.log('Test route hit');
-    res.json({ message: 'Backend is working!' });
+
+
+// Add this AFTER your middleware, BEFORE other routes
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'Authentication API is running!',
+        routes: {
+            test: '/api/test',
+            signup: '/api/auth/signup',
+            login: '/api/auth/login',
+            me: '/api/auth/me'
+        }
+    });
 });
+// Test route
+// app.get('/api/test', (req, res) => {
+//     console.log('Test route hit');
+//     res.json({ message: 'Backend is working!' });
+// });
 
 // Database
 mongoose.connect(process.env.MONGO_URI)
